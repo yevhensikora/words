@@ -1,27 +1,116 @@
 package com.epam.rd.autotasks.words;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class StringUtil {
     public static int countEqualIgnoreCaseAndSpaces(String[] words, String sample) {
-        throw new UnsupportedOperationException();
+        if (words == null || words.length == 0 || sample == null || sample.isEmpty()) return 0;
+
+
+        int count = 0;
+        String sample2 = sample.toLowerCase().trim();
+        for (int i = 0; i < words.length; i++) {
+            String qq = words[i].toLowerCase().trim();
+            if (words[i] != null &&
+                    !words[i].isEmpty() &&
+                    words[i].toLowerCase().trim().equals(sample2)) {
+                count++;
+            }
+
+        }
+        return count;
+
     }
 
     public static String[] splitWords(String text) {
-        throw new UnsupportedOperationException();
+        ArrayList<String> wordText = new ArrayList<String>();
+        boolean isWholeSeparator = true;
+        boolean inWord = true;
+        int startOfWord = 0;
+        if (text != null && !text.trim().isEmpty()) {
+            for (int i = 0; i < text.length(); i++) {
+                char c = text.charAt(i);
+                if (c == ',' || c == '.' || c == ';' || c == ':' || c == ' ' || c == '?' || c == '!') {
+                    if (!isWholeSeparator && inWord) {
+                        wordText.add(text.substring(startOfWord, i));
+                        inWord = false;
+                    }
+                    startOfWord = i + 1;
+                } else {
+                    isWholeSeparator = false;
+                    inWord = true;
+                }
+            }
+            if (!isWholeSeparator && inWord)
+                wordText.add(text.substring(startOfWord, text.length()));
+            if (isWholeSeparator)
+                return null;
+            else {
+                return wordText.toArray(String[]::new);
+            }
+
+        } else return null;
+
     }
 
+
+
     public static String convertPath(String path, boolean toWin) {
-        throw new UnsupportedOperationException();
+        String result;
+        if (path == null || path.isEmpty() ||
+                (path.indexOf("/") != -1 && path.indexOf("\\") != -1) || //  contain of '\' and '/'
+                (path.indexOf("~") == 0 && path.indexOf("\\") != -1) ||  // start character is '~' and contain of '\'
+                (path.indexOf("~", 1) > 0) ||
+                (path.indexOf("C:\\", 3) > 0) ||
+                (path.indexOf("\\\\") > 0) ||
+                (path.indexOf("//") > 0)
+        )
+            return null;
+        if (toWin) {
+            result = convert(path, "~", "C:\\User");
+            result = convert(result, "/", "C:\\");
+            result = result.replace("/", "\\");
+            return result;
+        } else {
+            result = convert(path, "C:\\User", "~");
+            result = convert(result, "C:\\", "/");
+            result = result.replace("\\", "/");
+            return result;
+        }
+    }
+
+    public static String convert(String path, String patternFrom, String PattegnTo) {
+        int i = path.indexOf(patternFrom);
+        if (i != -1 && i == 0)
+            return PattegnTo + path.substring(patternFrom.length());
+        return path;
     }
 
     public static String joinWords(String[] words) {
-        throw new UnsupportedOperationException();
+        if (words == null || words.length <= 0) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            if (words[i] != null && !words[i].isEmpty()) {
+                sb.append(words[i]);
+                sb.append(", ");
+            }
+        }
+        if (sb.length() == 0 )
+            return null;
+        else {
+            sb.delete(sb.length()-2, sb.length());
+            sb.insert(0,'[');
+            sb.append("]");
+            return sb.toString();
+        }
     }
 
     public static void main(String[] args) {
         System.out.println("Test 1: countEqualIgnoreCaseAndSpaces");
-        String[] words = new String[]{" WordS    \t", "words", "w0rds", "WOR  DS", };
+        String[] words = new String[]{" WordS    \t", "words", "w0rds", "WOR  DS",};
         String sample = "words   ";
         int countResult = countEqualIgnoreCaseAndSpaces(words, sample);
         System.out.println("Result: " + countResult);
